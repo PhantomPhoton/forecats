@@ -1,0 +1,118 @@
+{
+  "id": "forecats-flux-image",
+  "notes": "Documentation only — InvokeAIImageProvider builds this Flux / Flux Kontext graph at runtime (and a FLUX.2 variant when the selected main model base is flux2). Pet photos are uploaded and wired as flux_kontext conditioning; the final image comes from flux_vae_decode, not the reference image node.",
+  "nodes": {
+    "positive_prompt": {
+      "id": "positive_prompt",
+      "type": "string",
+      "value": "{{PROMPT}}"
+    },
+    "seed": {
+      "id": "seed",
+      "type": "integer",
+      "value": 42
+    },
+    "flux_model_loader": {
+      "id": "flux_model_loader",
+      "type": "flux_model_loader",
+      "model": {},
+      "t5_encoder_model": {},
+      "clip_embed_model": {},
+      "vae_model": {}
+    },
+    "flux_text_encoder": {
+      "id": "flux_text_encoder",
+      "type": "flux_text_encoder"
+    },
+    "pos_cond_collect": {
+      "id": "pos_cond_collect",
+      "type": "collect"
+    },
+    "flux_kontext_image_prep_0": {
+      "id": "flux_kontext_image_prep_0",
+      "type": "flux_kontext_image_prep",
+      "images": [{ "image_name": "{{REF_IMAGE}}" }]
+    },
+    "flux_kontext_0": {
+      "id": "flux_kontext_0",
+      "type": "flux_kontext"
+    },
+    "flux_kontext_collect": {
+      "id": "flux_kontext_collect",
+      "type": "collect"
+    },
+    "flux_denoise": {
+      "id": "flux_denoise",
+      "type": "flux_denoise",
+      "guidance": 3.5,
+      "num_steps": 20,
+      "width": 1024,
+      "height": 576,
+      "denoising_start": 0.0,
+      "denoising_end": 1.0
+    },
+    "flux_vae_decode": {
+      "id": "flux_vae_decode",
+      "type": "flux_vae_decode",
+      "is_intermediate": false
+    }
+  },
+  "edges": [
+    {
+      "source": { "node_id": "flux_model_loader", "field": "clip" },
+      "destination": { "node_id": "flux_text_encoder", "field": "clip" }
+    },
+    {
+      "source": { "node_id": "flux_model_loader", "field": "t5_encoder" },
+      "destination": { "node_id": "flux_text_encoder", "field": "t5_encoder" }
+    },
+    {
+      "source": { "node_id": "flux_model_loader", "field": "max_seq_len" },
+      "destination": { "node_id": "flux_text_encoder", "field": "t5_max_seq_len" }
+    },
+    {
+      "source": { "node_id": "flux_model_loader", "field": "transformer" },
+      "destination": { "node_id": "flux_denoise", "field": "transformer" }
+    },
+    {
+      "source": { "node_id": "flux_model_loader", "field": "vae" },
+      "destination": { "node_id": "flux_denoise", "field": "controlnet_vae" }
+    },
+    {
+      "source": { "node_id": "flux_model_loader", "field": "vae" },
+      "destination": { "node_id": "flux_vae_decode", "field": "vae" }
+    },
+    {
+      "source": { "node_id": "positive_prompt", "field": "value" },
+      "destination": { "node_id": "flux_text_encoder", "field": "prompt" }
+    },
+    {
+      "source": { "node_id": "flux_text_encoder", "field": "conditioning" },
+      "destination": { "node_id": "pos_cond_collect", "field": "item" }
+    },
+    {
+      "source": { "node_id": "pos_cond_collect", "field": "collection" },
+      "destination": { "node_id": "flux_denoise", "field": "positive_text_conditioning" }
+    },
+    {
+      "source": { "node_id": "seed", "field": "value" },
+      "destination": { "node_id": "flux_denoise", "field": "seed" }
+    },
+    {
+      "source": { "node_id": "flux_kontext_image_prep_0", "field": "image" },
+      "destination": { "node_id": "flux_kontext_0", "field": "image" }
+    },
+    {
+      "source": { "node_id": "flux_kontext_0", "field": "kontext_cond" },
+      "destination": { "node_id": "flux_kontext_collect", "field": "item" }
+    },
+    {
+      "source": { "node_id": "flux_kontext_collect", "field": "collection" },
+      "destination": { "node_id": "flux_denoise", "field": "kontext_conditioning" }
+    },
+    {
+      "source": { "node_id": "flux_denoise", "field": "latents" },
+      "destination": { "node_id": "flux_vae_decode", "field": "latents" }
+    }
+  ]
+}

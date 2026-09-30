@@ -1,21 +1,36 @@
 generate_pet_picture:
   name: Generate Pet Picture
-  description: Generate a weather-themed pet picture
+  description: >
+    Generate a weather-themed pet picture using a configured Forecats instance.
+    Fetches today's daily forecast from weather_entity.
   fields:
+    config_entry_id:
+      name: Forecats instance
+      description: Which Forecats config entry to use.
+      required: true
+      selector:
+        config_entry:
+          integration: forecats
+    weather_entity:
+      name: Weather entity
+      description: >
+        Weather entity used for today's daily forecast and temperature unit
+        (e.g. weather.forecast_home).
+      required: true
+      selector:
+        entity:
+          domain: weather
     location:
-      description: Location for weather context
+      name: Location
+      description: Location label for weather context (e.g. "Toronto, Ontario, Canada")
       example: "Toronto, Ontario, Canada"
       required: true
       selector:
         text:
-    forecast:
-      description: Weather forecast data
-      required: true
-    temperature_unit:
-      description: Temperature unit (e.g., "C" or "F")
-      required: true
     pets:
-      description: "list of your pets, each pet must have a name and description, and can have a type (default: cat)"
+      name: Pets
+      description: >
+        Pets to feature. Each needs a name and description; type defaults to cat.
       required: true
       selector:
         object:
@@ -25,6 +40,7 @@ generate_pet_picture:
           fields:
             name:
               label: Name
+              required: true
               selector:
                 text:
             type:
@@ -33,48 +49,95 @@ generate_pet_picture:
                 text:
             description:
               label: Description
+              required: true
               selector:
                 text:
+                  multiline: true
     input_image_dir:
+      name: Input images
       description: >
-        Path to a directory of reference pet images. All image files (jpg, png, webp,
-        etc.) in the directory will be used. Upload via HA Media Browser to
-        /config/media/ and reference the folder here (e.g. /config/media/forecats).
-      required: false
+        Pet reference images from the Media Browser (jpg/png/webp). Prefer a
+        folder (Local Media → forecats) so every image inside is used; or pick
+        a single file. The media UI cannot multi-select files yet — for several
+        explicit paths, use YAML. Leave empty to generate without references.
+      required: true
+      default: []
       selector:
-        text:
-    input_image_paths:
-      description: >
-        Explicit list of paths to reference images. Use this or input_image_dir
-        (or both).
-      required: false
+        media:
+          accept:
+            - image/*
+            - directory
+          multiple: true
+    art_styles:
+      name: Art styles
+      description: Styles to randomly choose from each run.
+      required: true
+      default:
+        - name: comic book
+        - name: anime
+        - name: pixar
+        - name: watercolor
+        - name: ghibli
+        - name: disney
       selector:
         object:
-    art_styles:
-      description: List of art styles to choose from
+          label_field: name
+          multiple: true
+          fields:
+            name:
+              label: Style
+              required: true
+              selector:
+                text:
+    final_image_size:
+      name: Final image size
+      description: >
+        Output crop/resize for your display. Pick a common size or type a
+        custom WIDTHxHEIGHT. Generation aspect/resolution/steps are set on
+        the Forecats instance config.
+      default: "800x480"
+      example: "800x480"
       required: true
       selector:
-        object:
-    image_gen_aspect_ratio:
-      description: Aspect ratio for generated image
-      default: "16:9"
-      selector:
-        text:
-    image_gen_resolution:
-      description: Resolution for generated image
-      default: "1K"
-      selector:
-        text:
-    final_image_size:
-      description: Final output image size
-      default: "1K"
-      example: "800x480"
+        select:
+          mode: dropdown
+          custom_value: true
+          options:
+            - label: "800×480 (7.5\" e-ink)"
+              value: "800x480"
+            - label: "960×640"
+              value: "960x640"
+            - label: "1200×825"
+              value: "1200x825"
+            - label: "1600×1200"
+              value: "1600x1200"
+            - label: "1024×768"
+              value: "1024x768"
+            - label: "640×384"
+              value: "640x384"
+            - label: "480×800 (portrait)"
+              value: "480x800"
+    output_dir:
+      name: Output directory
+      description: >
+        Folder for forecats_original.png and forecats_optimized.png.
+        Use a path under `/config/www/` to serve via `/local/...`
+        (default `/config/www/daily_forecats`).
+      required: true
+      default: "/config/www/daily_forecats"
+      example: "/config/www/daily_forecats"
       selector:
         text:
     display_profile:
-      description: Display profile (null or "spectra6")
+      name: Display profile
+      description: Color profile for your display.
       required: true
-      default: null
-      example: "spectra6"
+      default: ""
       selector:
-        text:
+        select:
+          mode: dropdown
+          options:
+            - label: "None (original colors)"
+              value: ""
+            - label: "Spectra 6 (e-ink)"
+              value: "spectra6"

@@ -1,0 +1,262 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Forecats instance",
+        "description": "Name this instance and choose backends for activity text and image generation.",
+        "data": {
+          "name": "Display name",
+          "activity_provider": "Activity text provider",
+          "image_provider": "Image generation provider"
+        },
+        "data_description": {
+          "name": "Label for this instance in Home Assistant (integrations list and config entry title).",
+          "activity_provider": "Creates the short story of what the pets are doing today. Gemini is cloud; OpenAI-compatible, InvokeAI, and Unsloth Studio run on your network.",
+          "image_provider": "Generates the pet picture from that activity plus your reference photos. Gemini (cloud), InvokeAI, or Unsloth Studio (local)."
+        }
+      },
+      "activity_credentials": {
+        "title": "Activity provider access",
+        "description": "Connection details for the activity text provider ({provider}).",
+        "data": {
+          "gemini_api_key": "Gemini API key",
+          "openai_base_url": "OpenAI-compatible base URL",
+          "openai_api_key": "API key (optional)",
+          "invokeai_base_url": "InvokeAI base URL",
+          "invokeai_api_token": "InvokeAI API token (optional)",
+          "unsloth_base_url": "Unsloth Studio base URL",
+          "unsloth_api_key": "Unsloth API key (optional)"
+        },
+        "data_description": {
+          "gemini_api_key": "API key from Google AI Studio / Gemini.",
+          "openai_base_url": "Root URL of an OpenAI-compatible server (Ollama, LM Studio, Unsloth, vLLM, …), for example `http://localhost:11434` or `http://localhost:1234/v1`.",
+          "openai_api_key": "Bearer API key if the server requires one. Leave blank for Ollama/LM Studio defaults that accept any or no key.",
+          "invokeai_base_url": "Root URL of your InvokeAI server, for example `http://localhost:9090`.",
+          "invokeai_api_token": "Bearer token if InvokeAI authentication is enabled. Leave blank if your server allows unauthenticated local access.",
+          "unsloth_base_url": "Root URL of Unsloth Studio, for example `http://localhost:8888`.",
+          "unsloth_api_key": "API key from Unsloth Settings → API (`sk-unsloth-…`). Leave blank only if keyless localhost access is enabled."
+        }
+      },
+      "activity_settings": {
+        "title": "Activity settings",
+        "description": "Model and timeout for generating the daily activity text. {discovery_note}",
+        "data": {
+          "gemini_activity_model": "Gemini activity model",
+          "gemini_activity_timeout": "Gemini activity timeout (seconds)",
+          "openai_activity_model": "Chat model",
+          "openai_activity_timeout": "Activity timeout (seconds)",
+          "invokeai_activity_model": "InvokeAI text LLM model",
+          "invokeai_activity_timeout": "InvokeAI activity timeout (seconds)",
+          "unsloth_activity_model": "Unsloth chat model",
+          "unsloth_activity_timeout": "Unsloth activity timeout (seconds)"
+        },
+        "data_description": {
+          "gemini_activity_model": "Text model used to invent the daily activity (for example gemini-2.0-flash).",
+          "gemini_activity_timeout": "How long to wait for activity text before failing the run.",
+          "openai_activity_model": "Model id from `GET /v1/models` (for example `llama3.2` or `llama3.2:latest`).",
+          "openai_activity_timeout": "How long to wait for activity text before failing.",
+          "invokeai_activity_model": "InvokeAI Text LLM model used to invent the daily activity.",
+          "invokeai_activity_timeout": "How long to wait for InvokeAI activity text before failing.",
+          "unsloth_activity_model": "Chat model id from Unsloth (`GET /v1/models`). Load the model in Studio before generating, or use auto-switch if enabled.",
+          "unsloth_activity_timeout": "How long to wait for Unsloth activity text before failing."
+        }
+      },
+      "image_credentials": {
+        "title": "Image provider access",
+        "description": "Connection details for the image provider ({provider}). Skipped when it matches the activity provider.",
+        "data": {
+          "gemini_api_key": "Gemini API key",
+          "invokeai_base_url": "InvokeAI base URL",
+          "invokeai_api_token": "InvokeAI API token (optional)",
+          "unsloth_base_url": "Unsloth Studio base URL",
+          "unsloth_api_key": "Unsloth API key (optional)"
+        },
+        "data_description": {
+          "gemini_api_key": "API key from Google AI Studio / Gemini.",
+          "invokeai_base_url": "Root URL of your InvokeAI server, for example `http://localhost:9090`.",
+          "invokeai_api_token": "Bearer token if InvokeAI authentication is enabled. Leave blank if your server allows unauthenticated local access.",
+          "unsloth_base_url": "Root URL of Unsloth Studio, for example `http://localhost:8888`.",
+          "unsloth_api_key": "API key from Unsloth Settings → API (`sk-unsloth-…`). Leave blank only if keyless localhost access is enabled."
+        }
+      },
+      "image_settings": {
+        "title": "Image settings",
+        "description": "Model and generation settings for the pet picture. Final display crop size is set later on the generate_pet_picture action. {discovery_note}",
+        "data": {
+          "gemini_image_model": "Gemini image model",
+          "gemini_image_timeout": "Gemini image timeout (seconds)",
+          "gemini_image_aspect_ratio": "Gemini image aspect ratio",
+          "gemini_image_resolution": "Gemini image resolution",
+          "invokeai_image_model": "InvokeAI main image model",
+          "invokeai_image_timeout": "InvokeAI image timeout (seconds)",
+          "invokeai_image_width": "InvokeAI image width",
+          "invokeai_image_height": "InvokeAI image height",
+          "invokeai_image_steps": "InvokeAI image steps",
+          "invokeai_image_guidance": "InvokeAI guidance / CFG",
+          "invokeai_image_seed": "InvokeAI image seed",
+          "unsloth_image_model": "Unsloth diffusion model (optional)",
+          "unsloth_image_timeout": "Unsloth image timeout (seconds)",
+          "unsloth_image_width": "Unsloth image width",
+          "unsloth_image_height": "Unsloth image height",
+          "unsloth_image_steps": "Unsloth image steps",
+          "unsloth_image_guidance": "Unsloth guidance / CFG",
+          "unsloth_image_seed": "Unsloth image seed"
+        },
+        "data_description": {
+          "gemini_image_model": "Image model used to generate the pet picture.",
+          "gemini_image_timeout": "How long to wait for Gemini image generation before failing.",
+          "gemini_image_aspect_ratio": "Shape of the generated image before Forecats crops it for your display (for example 16:9 or 1:1).",
+          "gemini_image_resolution": "Gemini output detail tier: 1K (faster/cheaper), 2K, or 4K (slower/more detail). Final crop size is still set on the generate action.",
+          "invokeai_image_model": "Main InvokeAI checkpoint / model used for image generation. Text encoders (T5/CLIP/Qwen3/…) and VAE are chosen automatically from installed companions matching the main model family.",
+          "invokeai_image_timeout": "How long to wait for InvokeAI image generation. CPU or low-VRAM runs can need a long timeout.",
+          "invokeai_image_width": "Width in pixels for the InvokeAI generation graph.",
+          "invokeai_image_height": "Height in pixels for the InvokeAI generation graph.",
+          "invokeai_image_steps": "Diffusion steps. More steps can improve quality but take longer.",
+          "invokeai_image_guidance": "Classifier-free guidance (CFG). Higher values stick closer to the prompt; typical ranges are roughly 2–8 depending on the model.",
+          "invokeai_image_seed": "Fixed seed for reproducible images. Use 0 for a random seed each run.",
+          "unsloth_image_model": "Optional diffusion model path to load (for example a FLUX.2 repo id). Leave blank to use whichever model is already loaded in Studio Images. Pet refs use FLUX.2 reference mode (max 4 images).",
+          "unsloth_image_timeout": "How long to wait for Unsloth image generation (includes model load if needed).",
+          "unsloth_image_width": "Width in pixels for Unsloth generation.",
+          "unsloth_image_height": "Height in pixels for Unsloth generation.",
+          "unsloth_image_steps": "Diffusion steps. More steps can improve quality but take longer.",
+          "unsloth_image_guidance": "Classifier-free guidance (CFG). Use the model's recommended value (often lower for distilled FLUX.2 Klein).",
+          "unsloth_image_seed": "Fixed seed for reproducible images. Use 0 for a random seed each run."
+        }
+      }
+    },
+    "error": {},
+    "abort": {
+      "invalid_provider": "Invalid provider selected."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Forecats instance",
+        "description": "Update the name and providers for this instance.",
+        "data": {
+          "name": "Display name",
+          "activity_provider": "Activity text provider",
+          "image_provider": "Image generation provider"
+        },
+        "data_description": {
+          "name": "Label for this instance in Home Assistant (integrations list and config entry title).",
+          "activity_provider": "Creates the short story of what the pets are doing today. Gemini is cloud; OpenAI-compatible, InvokeAI, and Unsloth Studio run on your network.",
+          "image_provider": "Generates the pet picture from that activity plus your reference photos. Gemini (cloud), InvokeAI, or Unsloth Studio (local)."
+        }
+      },
+      "activity_credentials": {
+        "title": "Activity provider access",
+        "description": "Connection details for the activity text provider ({provider}).",
+        "data": {
+          "gemini_api_key": "Gemini API key",
+          "openai_base_url": "OpenAI-compatible base URL",
+          "openai_api_key": "API key (optional)",
+          "invokeai_base_url": "InvokeAI base URL",
+          "invokeai_api_token": "InvokeAI API token (optional)",
+          "unsloth_base_url": "Unsloth Studio base URL",
+          "unsloth_api_key": "Unsloth API key (optional)"
+        },
+        "data_description": {
+          "gemini_api_key": "API key from Google AI Studio / Gemini.",
+          "openai_base_url": "Root URL of an OpenAI-compatible server (Ollama, LM Studio, Unsloth, vLLM, …), for example `http://localhost:11434` or `http://localhost:1234/v1`.",
+          "openai_api_key": "Bearer API key if the server requires one. Leave blank for Ollama/LM Studio defaults that accept any or no key.",
+          "invokeai_base_url": "Root URL of your InvokeAI server, for example `http://localhost:9090`.",
+          "invokeai_api_token": "Bearer token if InvokeAI authentication is enabled. Leave blank if your server allows unauthenticated local access.",
+          "unsloth_base_url": "Root URL of Unsloth Studio, for example `http://localhost:8888`.",
+          "unsloth_api_key": "API key from Unsloth Settings → API (`sk-unsloth-…`). Leave blank only if keyless localhost access is enabled."
+        }
+      },
+      "activity_settings": {
+        "title": "Activity settings",
+        "description": "Model and timeout for generating the daily activity text. {discovery_note}",
+        "data": {
+          "gemini_activity_model": "Gemini activity model",
+          "gemini_activity_timeout": "Gemini activity timeout (seconds)",
+          "openai_activity_model": "Chat model",
+          "openai_activity_timeout": "Activity timeout (seconds)",
+          "invokeai_activity_model": "InvokeAI text LLM model",
+          "invokeai_activity_timeout": "InvokeAI activity timeout (seconds)",
+          "unsloth_activity_model": "Unsloth chat model",
+          "unsloth_activity_timeout": "Unsloth activity timeout (seconds)"
+        },
+        "data_description": {
+          "gemini_activity_model": "Text model used to invent the daily activity (for example gemini-2.0-flash).",
+          "gemini_activity_timeout": "How long to wait for activity text before failing the run.",
+          "openai_activity_model": "Model id from `GET /v1/models` (for example `llama3.2` or `llama3.2:latest`).",
+          "openai_activity_timeout": "How long to wait for activity text before failing.",
+          "invokeai_activity_model": "InvokeAI Text LLM model used to invent the daily activity.",
+          "invokeai_activity_timeout": "How long to wait for InvokeAI activity text before failing.",
+          "unsloth_activity_model": "Chat model id from Unsloth (`GET /v1/models`). Load the model in Studio before generating, or use auto-switch if enabled.",
+          "unsloth_activity_timeout": "How long to wait for Unsloth activity text before failing."
+        }
+      },
+      "image_credentials": {
+        "title": "Image provider access",
+        "description": "Connection details for the image provider ({provider}). Skipped when it matches the activity provider.",
+        "data": {
+          "gemini_api_key": "Gemini API key",
+          "invokeai_base_url": "InvokeAI base URL",
+          "invokeai_api_token": "InvokeAI API token (optional)",
+          "unsloth_base_url": "Unsloth Studio base URL",
+          "unsloth_api_key": "Unsloth API key (optional)"
+        },
+        "data_description": {
+          "gemini_api_key": "API key from Google AI Studio / Gemini.",
+          "invokeai_base_url": "Root URL of your InvokeAI server, for example `http://localhost:9090`.",
+          "invokeai_api_token": "Bearer token if InvokeAI authentication is enabled. Leave blank if your server allows unauthenticated local access.",
+          "unsloth_base_url": "Root URL of Unsloth Studio, for example `http://localhost:8888`.",
+          "unsloth_api_key": "API key from Unsloth Settings → API (`sk-unsloth-…`). Leave blank only if keyless localhost access is enabled."
+        }
+      },
+      "image_settings": {
+        "title": "Image settings",
+        "description": "Model and generation settings for the pet picture. Final display crop size is set later on the generate_pet_picture action. {discovery_note}",
+        "data": {
+          "gemini_image_model": "Gemini image model",
+          "gemini_image_timeout": "Gemini image timeout (seconds)",
+          "gemini_image_aspect_ratio": "Gemini image aspect ratio",
+          "gemini_image_resolution": "Gemini image resolution",
+          "invokeai_image_model": "InvokeAI main image model",
+          "invokeai_image_timeout": "InvokeAI image timeout (seconds)",
+          "invokeai_image_width": "InvokeAI image width",
+          "invokeai_image_height": "InvokeAI image height",
+          "invokeai_image_steps": "InvokeAI image steps",
+          "invokeai_image_guidance": "InvokeAI guidance / CFG",
+          "invokeai_image_seed": "InvokeAI image seed",
+          "unsloth_image_model": "Unsloth diffusion model (optional)",
+          "unsloth_image_timeout": "Unsloth image timeout (seconds)",
+          "unsloth_image_width": "Unsloth image width",
+          "unsloth_image_height": "Unsloth image height",
+          "unsloth_image_steps": "Unsloth image steps",
+          "unsloth_image_guidance": "Unsloth guidance / CFG",
+          "unsloth_image_seed": "Unsloth image seed"
+        },
+        "data_description": {
+          "gemini_image_model": "Image model used to generate the pet picture.",
+          "gemini_image_timeout": "How long to wait for Gemini image generation before failing.",
+          "gemini_image_aspect_ratio": "Shape of the generated image before Forecats crops it for your display (for example 16:9 or 1:1).",
+          "gemini_image_resolution": "Gemini output detail tier: 1K (faster/cheaper), 2K, or 4K (slower/more detail). Final crop size is still set on the generate action.",
+          "invokeai_image_model": "Main InvokeAI checkpoint / model used for image generation. Text encoders (T5/CLIP/Qwen3/…) and VAE are chosen automatically from installed companions matching the main model family.",
+          "invokeai_image_timeout": "How long to wait for InvokeAI image generation. CPU or low-VRAM runs can need a long timeout.",
+          "invokeai_image_width": "Width in pixels for the InvokeAI generation graph.",
+          "invokeai_image_height": "Height in pixels for the InvokeAI generation graph.",
+          "invokeai_image_steps": "Diffusion steps. More steps can improve quality but take longer.",
+          "invokeai_image_guidance": "Classifier-free guidance (CFG). Higher values stick closer to the prompt; typical ranges are roughly 2–8 depending on the model.",
+          "invokeai_image_seed": "Fixed seed for reproducible images. Use 0 for a random seed each run.",
+          "unsloth_image_model": "Optional diffusion model path to load (for example a FLUX.2 repo id). Leave blank to use whichever model is already loaded in Studio Images. Pet refs use FLUX.2 reference mode (max 4 images).",
+          "unsloth_image_timeout": "How long to wait for Unsloth image generation (includes model load if needed).",
+          "unsloth_image_width": "Width in pixels for Unsloth generation.",
+          "unsloth_image_height": "Height in pixels for Unsloth generation.",
+          "unsloth_image_steps": "Diffusion steps. More steps can improve quality but take longer.",
+          "unsloth_image_guidance": "Classifier-free guidance (CFG). Use the model's recommended value (often lower for distilled FLUX.2 Klein).",
+          "unsloth_image_seed": "Fixed seed for reproducible images. Use 0 for a random seed each run."
+        }
+      }
+    },
+    "error": {},
+    "abort": {
+      "invalid_provider": "Invalid provider selected."
+    }
+  }
+}

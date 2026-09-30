@@ -1,49 +1,37 @@
 - id: "<YOUR AUTOMATION ID>"
   alias: generate forecats
-  description: ''
+  description: Forecats generation via the forecats.generate_pet_picture action
   triggers:
     - trigger: time
       at: "05:00:00"
   conditions: []
   actions:
-    - action: weather.get_forecasts
-      metadata: {}
-      data:
-        type: daily
-      target:
-        entity_id: weather.forecast_home
-      response_variable: todays_forecast
     - action: forecats.generate_pet_picture
       data:
-        gemini_api_key: "<YOUR API KEY>"
+        config_entry_id: "<FORECATS CONFIG ENTRY ID>"
+        weather_entity: weather.forecast_home
         location: "<YOUR LOCATION>"
-        forecast: "{{ todays_forecast['weather.forecast_home'].forecast[0] }}"
-        temperature_unit: "{{ state_attr('weather.forecast_home', 'temperature_unit') }}"
         pets:
           - name: "<PET 1>"
-            type: "<PET 1 TYPE> (default: cat)"
+            type: cat
             description: >
               <PET 1 DESCRIPTION>
           - name: "<PET 2>"
-            type: "<PET 2 TYPE> (default: cat)"
+            type: dog
             description: >
               <PET 2 DESCRIPTION>
-          - "<...>"
-        input_image_paths: 
-          - "/config/forecats_data/input_images/<PET1>.jpg"
-          - "/config/forecats_data/input_images/<PET1 and <PET2>.jpg"
-          - "/config/forecats_data/input_images/<PET2>.jpg"
-          - "<...>" # Up to 14 images total
-        art_styles: 
-          - "comic book"
-          - "anime"
-          - "pixar"
-          - "watercolor"
-          - "ghibli"
-          - "disney"
-          - "<...>" # As many animation styles as you want
-        image_gen_aspect_ratio: "16:9"
-        image_gen_resolution: "1K"
-        final_image_size: "800x480" # Or whatever you want, as long as its <= image_gen_resolution
-        display_profile: "spectra6" # Currently supports null (original image) or "spectra6"
+        # Prefer the Media Browser picker in the UI. YAML equivalent:
+        input_image_dir:
+          - media_content_id: media-source://media_source/local/forecats
+            media_content_type: ""
+        art_styles:
+          - name: comic book
+          - name: anime
+          - name: pixar
+          - name: watercolor
+          - name: ghibli
+          - name: disney
+        final_image_size: "800x480"
+        output_dir: /config/www/daily_forecats
+        display_profile: spectra6
   mode: single

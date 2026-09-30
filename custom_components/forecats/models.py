@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
 
 
 class Pet(BaseModel):
@@ -8,9 +8,7 @@ class Pet(BaseModel):
 
 
 class GenerateRequest(BaseModel):
-    """Request model for generating pet pictures."""
-
-    gemini_api_key: str
+    """Request model for generating pet pictures (per-run inputs only)."""
 
     location: str
     forecast: dict
@@ -20,14 +18,8 @@ class GenerateRequest(BaseModel):
     input_image_dir: str | None = None
     art_styles: list[str]
 
-    image_gen_aspect_ratio: str
-    image_gen_resolution: str
     final_image_size: str
+    # Resolved filesystem directory for forecats_original/optimized.png.
+    output_dir: str
 
-    display_profile: str | None
-
-    @model_validator(mode="after")
-    def check_images_provided(self):
-        if not self.input_image_paths and not self.input_image_dir:
-            raise ValueError("Either input_image_paths or input_image_dir must be provided.")
-        return self
+    display_profile: str | None = None
